@@ -5,7 +5,8 @@ from __future__ import annotations
 
 import argparse
 import re
-from typing import Iterable, List, Sequence
+import sys
+from typing import List, Sequence
 
 CODON_TABLE = {
     "TTT": "F", "TTC": "F", "TTA": "L", "TTG": "L",
@@ -97,7 +98,7 @@ def find_motifs(sequence: str, motif: str) -> Sequence[int]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Translate DNA and find motifs.")
-    parser.add_argument("sequence", help="DNA sequence (A,C,G,T,N)")
+    parser.add_argument("sequence", nargs="?", help="DNA sequence (A,C,G,T,N)")
     parser.add_argument("--frame", type=int, choices=[1, 2, 3], default=1, help="Reading frame")
     parser.add_argument("--reverse-complement", action="store_true", help="Use reverse complement before analysis")
     parser.add_argument("--stop-at-stop", action="store_true", help="Stop translation at the first stop codon")
@@ -108,6 +109,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
+
+    if not args.sequence:
+        parser.print_usage()
+        print("error: sequence is required (example: ATGAAATGA)", file=sys.stderr)
+        return 2
 
     try:
         sequence = normalize_dna(args.sequence)
@@ -133,4 +139,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
