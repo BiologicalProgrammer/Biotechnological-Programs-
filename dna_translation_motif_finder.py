@@ -96,6 +96,16 @@ def find_motifs(sequence: str, motif: str) -> Sequence[int]:
     return [match.start() for match in pattern.finditer(sequence)]
 
 
+
+
+def prompt_for_sequence() -> str | None:
+    """Prompt interactively for a DNA sequence (useful in IDLE)."""
+    try:
+        value = input("Enter DNA sequence: ").strip()
+    except EOFError:
+        return None
+    return value or None
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Translate DNA and find motifs.")
     parser.add_argument("sequence", nargs="?", help="DNA sequence (A,C,G,T,N)")
@@ -111,9 +121,13 @@ def main() -> int:
     args = parser.parse_args()
 
     if not args.sequence:
-        parser.print_usage()
-        print("error: sequence is required (example: ATGAAATGA)", file=sys.stderr)
-        return 2
+        if len(sys.argv) == 1:
+            args.sequence = prompt_for_sequence()
+
+        if not args.sequence:
+            parser.print_usage()
+            print("error: sequence is required (example: ATGAAATGA)", file=sys.stderr)
+            return 2
 
     try:
         sequence = normalize_dna(args.sequence)
@@ -139,4 +153,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    main()
+    if "idlelib" in sys.modules:
+        main()
+    else:
+        raise SystemExit(main())

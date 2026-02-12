@@ -18,6 +18,13 @@ python3 dna_translation_motif_finder.py "ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG
 - `--stop-at-stop`: Stop translation at first stop codon
 - `--motif MOTIF`: Find motif and print all match positions (0-based)
 
+
+If you run the script from **Python IDLE** (Run Module) without command-line arguments, it will prompt:
+
+```text
+Enter DNA sequence:
+```
+
 ## Example
 
 ```bash
