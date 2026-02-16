@@ -1,41 +1,79 @@
 # DNA Translation and Motif Finder
 
-A lightweight Python command-line tool that:
+This project provides two interfaces:
 
-1. Translates DNA sequences into protein sequences.
-2. Finds DNA motifs (including IUPAC ambiguity codes) in a sequence.
+1. A **CLI tool** for translating DNA and finding motifs.
+2. A **web app** (FastAPI + HTML/JS) for browser-based analysis.
 
-## Usage
+## Features
+
+- DNA normalization/validation (`A`, `C`, `G`, `T`, `N`)
+- Translation in frame `1`, `2`, or `3`
+- Reverse-complement option
+- Optional stop-at-first-stop behavior
+- Motif search with overlapping matches
+- IUPAC motif ambiguity support (e.g., `AAR`, `GGN`)
+
+## CLI usage
 
 ```bash
 python3 dna_translation_motif_finder.py "ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG" --motif "GGN"
 ```
 
-### Options
+### CLI options
 
 - `--frame {1,2,3}`: Select translation reading frame (default `1`)
 - `--reverse-complement`: Analyze reverse complement instead of input sequence
 - `--stop-at-stop`: Stop translation at first stop codon
 - `--motif MOTIF`: Find motif and print all match positions (0-based)
 
-
-If you run the script from **Python IDLE** (Run Module) without command-line arguments, it enters an interactive menu and prompts for:
+If you run from **Python IDLE** with no command-line arguments, an interactive menu collects:
 
 - DNA sequence
-- translation frame (`1`, `2`, or `3`)
-- reverse complement (`y/n`)
-- stop at first stop codon (`y/n`)
+- reading frame
+- reverse-complement choice
+- stop-at-stop choice
 - optional motif
 
+## Website usage
 
-## Example
+### 1) Install dependencies
 
 ```bash
-python3 dna_translation_motif_finder.py "ATGAAATGA" --stop-at-stop --motif "AAR"
+python3 -m pip install -r requirements.txt
 ```
 
-Expected output shape:
+### 2) Run the web app
 
-- DNA sequence used for analysis
-- Translated protein sequence
-- Motif hit positions (if motif supplied)
+```bash
+uvicorn app:app --reload
+```
+
+### 3) Open in browser
+
+Visit: `http://127.0.0.1:8000`
+
+Use the form to submit sequence/options and view translation + motif results.
+
+## API endpoint
+
+`POST /api/analyze`
+
+Example JSON payload:
+
+```json
+{
+  "sequence": "ATGAAATGA",
+  "frame": 1,
+  "reverse_complement": false,
+  "stop_at_stop": true,
+  "motif": "AAR"
+}
+```
+
+Example response fields:
+
+- `dna`
+- `protein`
+- `motif_positions`
+- plus selected option flags
