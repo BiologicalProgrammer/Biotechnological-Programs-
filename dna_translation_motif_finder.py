@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from dataclasses import dataclass
 from typing import List, Sequence
 
 CODON_TABLE = {
@@ -44,6 +45,15 @@ IUPAC_TO_REGEX = {
     "V": "[ACG]",
     "N": "[ACGT]",
 }
+
+
+@dataclass
+class InteractiveOptions:
+    sequence: str
+    frame: int = 1
+    reverse_complement: bool = False
+    stop_at_stop: bool = False
+    motif: str | None = None
 
 
 def normalize_dna(sequence: str) -> str:
@@ -96,15 +106,75 @@ def find_motifs(sequence: str, motif: str) -> Sequence[int]:
     return [match.start() for match in pattern.finditer(sequence)]
 
 
-
-
 def prompt_for_sequence() -> str | None:
-    """Prompt interactively for a DNA sequence (useful in IDLE)."""
+    """Prompt for a DNA sequence."""
     try:
         value = input("Enter DNA sequence: ").strip()
     except EOFError:
         return None
     return value or None
+
+
+def prompt_yes_no(question: str, default: bool = False) -> bool:
+    """Prompt for yes/no and return bool."""
+    suffix = " [Y/n]: " if default else " [y/N]: "
+
+    while True:
+        try:
+            raw = input(question + suffix).strip().lower()
+        except EOFError:
+            return default
+
+        if not raw:
+            return default
+        if raw in {"y", "yes"}:
+            return True
+        if raw in {"n", "no"}:
+            return False
+
+        print("Please answer y or n.")
+
+
+def prompt_frame(default: int = 1) -> int:
+    """Prompt for translation frame 1-3."""
+    while True:
+        try:
+            raw = input(f"Reading frame [1/2/3] (default {default}): ").strip()
+        except EOFError:
+            return default
+
+        if not raw:
+            return default
+        if raw in {"1", "2", "3"}:
+            return int(raw)
+
+        print("Please enter 1, 2, or 3.")
+
+
+def interactive_menu() -> InteractiveOptions | None:
+    """Collect options interactively (ideal for IDLE users)."""
+    print("Interactive mode: enter options (press Enter to accept defaults).")
+    sequence = prompt_for_sequence()
+    if not sequence:
+        return None
+
+    frame = prompt_frame(default=1)
+    reverse = prompt_yes_no("Use reverse complement?", default=False)
+    stop_at_stop = prompt_yes_no("Stop translation at first stop codon?", default=False)
+
+    try:
+        motif_raw = input("Motif (optional, supports IUPAC codes): ").strip()
+    except EOFError:
+        motif_raw = ""
+
+    return InteractiveOptions(
+        sequence=sequence,
+        frame=frame,
+        reverse_complement=reverse,
+        stop_at_stop=stop_at_stop,
+        motif=motif_raw or None,
+    )
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Translate DNA and find motifs.")
@@ -122,7 +192,13 @@ def main() -> int:
 
     if not args.sequence:
         if len(sys.argv) == 1:
-            args.sequence = prompt_for_sequence()
+            interactive = interactive_menu()
+            if interactive:
+                args.sequence = interactive.sequence
+                args.frame = interactive.frame
+                args.reverse_complement = interactive.reverse_complement
+                args.stop_at_stop = interactive.stop_at_stop
+                args.motif = interactive.motif
 
         if not args.sequence:
             parser.print_usage()

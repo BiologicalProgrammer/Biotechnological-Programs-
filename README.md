@@ -19,11 +19,14 @@ python3 dna_translation_motif_finder.py "ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG
 - `--motif MOTIF`: Find motif and print all match positions (0-based)
 
 
-If you run the script from **Python IDLE** (Run Module) without command-line arguments, it will prompt:
+If you run the script from **Python IDLE** (Run Module) without command-line arguments, it enters an interactive menu and prompts for:
 
-```text
-Enter DNA sequence:
-```
+- DNA sequence
+- translation frame (`1`, `2`, or `3`)
+- reverse complement (`y/n`)
+- stop at first stop codon (`y/n`)
+- optional motif
+
 
 ## Example
 
