@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DNA Translation and Motif Finder</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>DNA Translation and Motif Finder</h1>
+      <p class="subtitle">Analyze DNA sequences in your browser.</p>
+
+      <form id="analysis-form">
+        <label for="sequence">DNA Sequence</label>
+        <textarea id="sequence" name="sequence" rows="5" placeholder="ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG" required></textarea>
+
+        <div class="row">
+          <div>
+            <label for="frame">Reading frame</label>
+            <select id="frame" name="frame">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="motif">Motif (optional, IUPAC)</label>
+            <input id="motif" name="motif" placeholder="AAR" />
+          </div>
+        </div>
+
+        <label class="check"><input type="checkbox" id="reverse_complement" /> Use reverse complement</label>
+        <label class="check"><input type="checkbox" id="stop_at_stop" /> Stop at first stop codon</label>
+
+        <button type="submit">Analyze</button>
+      </form>
+
+      <section id="result" class="card hidden"></section>
+      <section id="error" class="error hidden"></section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
